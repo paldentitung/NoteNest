@@ -1,4 +1,7 @@
 @import "tailwindcss";
+:root {
+  --mainColor: rgb(32, 93, 153);
+}
 body {
   font-family: "Roboto", sans-serif;
 }
