@@ -1,21 +1,39 @@
 import React from "react";
-import { FaStar, FaRegStar, FaFilePdf, FaFileAlt } from "react-icons/fa";
+import {
+  FaStar,
+  FaRegStar,
+  FaFilePdf,
+  FaFileAlt,
+  FaEdit,
+  FaTrash,
+} from "react-icons/fa";
 
-const NoteCard = ({ note, toggleFavorite }) => {
+const NoteCard = ({ note, toggleFavorite, handleEdit, handleDelete }) => {
   return (
     <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col gap-3">
-      {/* Header: Subject + Favorite */}
+      {/* Header: Subject + Favorite + Edit/Delete */}
       <div className="flex justify-between items-center">
         <span className="text-sm font-semibold text-(--mainColor)">
           {note.subject}
         </span>
-        <button onClick={() => toggleFavorite(note.id)}>
-          {note.isFavorite ? (
-            <FaStar className="text-yellow-400" />
-          ) : (
-            <FaRegStar className="text-gray-400" />
-          )}
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Favorite */}
+          <button onClick={() => toggleFavorite(note.id)}>
+            {note.isFavorite ? (
+              <FaStar className="text-yellow-400" />
+            ) : (
+              <FaRegStar className="text-gray-400" />
+            )}
+          </button>
+          {/* Edit */}
+          <button onClick={() => handleEdit(note.id)}>
+            <FaEdit className="text-blue-500 hover:text-blue-700 transition" />
+          </button>
+          {/* Delete */}
+          <button onClick={() => handleDelete(note.id)}>
+            <FaTrash className="text-red-500 hover:text-red-700 transition" />
+          </button>
+        </div>
       </div>
 
       {/* Title */}
@@ -40,7 +58,7 @@ const NoteCard = ({ note, toggleFavorite }) => {
           <a
             target="_blank"
             rel="noopener noreferrer"
-            className="px-2 py-1 text-xs bg-(--mainColor) text-white rounded  opacity-85 hover:cursor-pointer hover:opacity-100 transition"
+            className="px-2 py-1 text-xs bg-(--mainColor) text-white rounded hover:opacity-100 transition"
           >
             View
           </a>

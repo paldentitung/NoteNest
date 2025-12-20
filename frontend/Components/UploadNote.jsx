@@ -14,6 +14,7 @@ const UploadNote = ({ showUploadForm, setShowUploadForm }) => {
 
     if (!title || !subject || !semester || !description || !file) {
       toast.error("Enter the valid info");
+      return;
     }
     toast.success("Note added");
     setTitle("");
