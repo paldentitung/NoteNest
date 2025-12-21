@@ -2,27 +2,43 @@ import React, { useState } from "react";
 import MainButton from "./MainButton";
 import SecondaryButton from "./SecondaryButton";
 import toast from "react-hot-toast";
-const UploadNote = ({ showUploadForm, setShowUploadForm }) => {
+import { createNote } from "../Services/noteService";
+const UploadNote = ({ showUploadForm, setShowUploadForm, setData }) => {
   const [title, setTitle] = useState("");
   const [subject, setSubject] = useState("");
   const [semester, setSemester] = useState("");
   const [description, setDescription] = useState("");
   const [file, setFile] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!title || !subject || !semester || !description || !file) {
       toast.error("Enter the valid info");
       return;
     }
-    toast.success("Note added");
+    const newNote = {
+      title,
+      subject,
+      semester,
+      description,
+      file,
+    };
+    try {
+      const createdNote = await createNote(newNote);
+      toast.success("Note added");
+      setData((prevNotes) => [createdNote, ...prevNotes]);
+    } catch (error) {
+      toast.error(error.message || "Something went wrong");
+    }
+
     setTitle("");
     setSubject("");
     setSemester("");
     setDescription("");
     setFile("");
   };
+
   return (
     <>
       <section
@@ -96,8 +112,7 @@ const UploadNote = ({ showUploadForm, setShowUploadForm }) => {
           <div>
             <input
               type="file"
-              value={file}
-              onChange={(e) => setFile(e.target.value)}
+              onChange={(e) => setFile(e.target.files[0])}
               className="p-2 rounded w-full outline-0 border-0 ring-2 ring-gray-400 focus:ring-mainColor"
             />
           </div>

@@ -18,6 +18,7 @@ const App = () => {
         <UploadNote
           showUploadForm={showUploadForm}
           setShowUploadForm={setShowUploadForm}
+          setData={setData}
         />
         <NoteDashboard data={data} setData={setData} />
       </div>
