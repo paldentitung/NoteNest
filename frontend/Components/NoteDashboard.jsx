@@ -1,6 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import NoteCard from "./NoteCard";
-const NoteDashboard = () => {
+import { getNotes } from "../Services/noteService";
+const NoteDashboard = ({ data, setData }) => {
+  useEffect(() => {
+    const fetchNotes = async () => {
+      const notes = await getNotes();
+      setData(notes);
+    };
+    fetchNotes();
+  }, []);
+  useEffect(() => {
+    console.log("Updated notes:", data);
+  }, [data]);
+
   const notesData = [
     {
       id: "1",
@@ -94,7 +106,7 @@ const NoteDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
-        {notesData.map((note) => (
+        {data.map((note) => (
           <NoteCard key={note.id} note={note} />
         ))}
       </div>

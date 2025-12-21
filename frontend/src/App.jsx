@@ -5,6 +5,8 @@ import NoteDashboard from "../Components/NoteDashboard";
 import { Toaster } from "react-hot-toast";
 const App = () => {
   const [showUploadForm, setShowUploadForm] = useState(false);
+  const [data, setData] = useState([]);
+
   return (
     <div className="bg-gray-50 min-h-screen">
       <Toaster position="top-right" />
@@ -17,7 +19,7 @@ const App = () => {
           showUploadForm={showUploadForm}
           setShowUploadForm={setShowUploadForm}
         />
-        <NoteDashboard />
+        <NoteDashboard data={data} setData={setData} />
       </div>
     </div>
   );
