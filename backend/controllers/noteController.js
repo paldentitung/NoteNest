@@ -43,6 +43,34 @@ exports.createNote = (req, res) => {
 
   res.json({ message: "Note created", note: newNote });
 };
+exports.updateNote = (req, res) => {
+  const id = parseInt(req.params.id);
+  const notes = getNotes();
+  const { title, subject, semester, description, isFavorite } = req.body;
+  const updatedNoteIndex = notes.findIndex((note) => note.id == id);
+
+  if (updatedNoteIndex === -1) {
+    return res.status(404).json({
+      message: "Not found",
+    });
+  }
+
+  notes[updatedNoteIndex] = {
+    ...notes[updatedNoteIndex],
+    title: title ?? notes[updatedNoteIndex].title,
+    subject: subject ?? notes[updatedNoteIndex].subject,
+    semester: semester ?? notes[updatedNoteIndex].semester,
+    description: description ?? notes[updatedNoteIndex].description,
+    isFavorite: isFavorite ?? notes[updatedNoteIndex].isFavorite,
+  };
+
+  saveNotes(notes);
+
+  res.status(200).json({
+    message: "Note update",
+    note: notes[updatedNoteIndex],
+  });
+};
 exports.deleteNote = (req, res) => {
   const id = parseInt(req.params.id);
   const notes = getNotes();
