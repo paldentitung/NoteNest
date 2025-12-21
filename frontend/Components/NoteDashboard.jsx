@@ -77,7 +77,7 @@ const NoteDashboard = ({ data, setData }) => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
         {filterData.map((note) => (
-          <NoteCard key={note.id} note={note} />
+          <NoteCard key={note.id} note={note} setData={setData} />
         ))}
       </div>
     </section>

@@ -8,8 +8,8 @@ import {
   FaTrash,
   FaTimes,
 } from "react-icons/fa";
-
-const NoteCard = ({ note, toggleFavorite, handleEdit, handleDelete }) => {
+import { deleteNote } from "../Services/noteService";
+const NoteCard = ({ note, toggleFavorite, handleEdit, setData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => setIsModalOpen(true);
@@ -17,7 +17,10 @@ const NoteCard = ({ note, toggleFavorite, handleEdit, handleDelete }) => {
 
   const isPdf = note.fileType === "pdf";
   const fileUrl = `http://localhost:3000${note.filePath}`;
-
+  const handleDelete = async (id) => {
+    const deletedNote = await deleteNote(id);
+    setData((prev) => prev.filter((note) => note.id !== id));
+  };
   return (
     <>
       <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col gap-3">

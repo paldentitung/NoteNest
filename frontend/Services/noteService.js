@@ -41,3 +41,9 @@ export const createNote = async (newNote) => {
     throw error;
   }
 };
+export const deleteNote = async (id) => {
+  const res = fetch(`${API_URL}/${id}`, {
+    method: "DELETE",
+  });
+  (await res).json();
+};

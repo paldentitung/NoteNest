@@ -43,3 +43,22 @@ exports.createNote = (req, res) => {
 
   res.json({ message: "Note created", note: newNote });
 };
+exports.deleteNote = (req, res) => {
+  const id = parseInt(req.params.id);
+  const notes = getNotes();
+  const deleteNoteIndex = notes.findIndex((note) => note.id == id);
+
+  if (deleteNoteIndex === -1) {
+    return res.status(404).json({
+      message: "Not found",
+    });
+  }
+
+  notes.splice(deleteNoteIndex, 1)[0];
+  saveNotes(notes);
+
+  res.status(200).json({
+    message: "Note delete",
+    note: this.deleteNote,
+  });
+};
