@@ -91,18 +91,26 @@ const NoteDashboard = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
-        {filterData.map((note) => (
-          <NoteCard
-            key={note.id}
-            note={note}
-            setData={setData}
-            setShowUploadForm={setShowUploadForm}
-            setSelectedNote={setSelectedNote}
-            toggleFavorite={toggleFavorite}
-          />
-        ))}
-      </div>
+      {filterData.length > 0 ? (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
+            {filterData.map((note) => (
+              <NoteCard
+                key={note.id}
+                note={note}
+                setData={setData}
+                setShowUploadForm={setShowUploadForm}
+                setSelectedNote={setSelectedNote}
+                toggleFavorite={toggleFavorite}
+              />
+            ))}
+          </div>
+        </>
+      ) : (
+        <>
+          <p className="text-2xl text-red-600 text-center">Not Found</p>
+        </>
+      )}
     </section>
   );
 };
