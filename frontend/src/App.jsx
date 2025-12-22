@@ -6,6 +6,7 @@ import { Toaster } from "react-hot-toast";
 const App = () => {
   const [showUploadForm, setShowUploadForm] = useState(false);
   const [data, setData] = useState([]);
+  const [selectedNote, setSelectedNote] = useState(null);
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -19,8 +20,14 @@ const App = () => {
           showUploadForm={showUploadForm}
           setShowUploadForm={setShowUploadForm}
           setData={setData}
+          data={selectedNote}
         />
-        <NoteDashboard data={data} setData={setData} />
+        <NoteDashboard
+          data={data}
+          setData={setData}
+          setShowUploadForm={setShowUploadForm}
+          setSelectedNote={setSelectedNote}
+        />
       </div>
     </div>
   );

@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import NoteCard from "./NoteCard";
 import { getNotes } from "../Services/noteService";
-const NoteDashboard = ({ data, setData }) => {
+const NoteDashboard = ({
+  data,
+  setData,
+  setShowUploadForm,
+  setSelectedNote,
+}) => {
   const [searchItem, setSearchITem] = useState("");
   const [subjectFilter, setSubjectFilter] = useState("");
   const [semester, setSemester] = useState("");
@@ -17,6 +22,7 @@ const NoteDashboard = ({ data, setData }) => {
   }, [data]);
 
   const filterData = data.filter((data) => {
+    if (!data || !data.title || !data.description) return false;
     const searchQuery =
       data.title.toLowerCase().includes(searchItem.toLowerCase()) ||
       data.description.toLowerCase().includes(searchItem.toLowerCase());
@@ -77,7 +83,13 @@ const NoteDashboard = ({ data, setData }) => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
         {filterData.map((note) => (
-          <NoteCard key={note.id} note={note} setData={setData} />
+          <NoteCard
+            key={note.id}
+            note={note}
+            setData={setData}
+            setShowUploadForm={setShowUploadForm}
+            setSelectedNote={setSelectedNote}
+          />
         ))}
       </div>
     </section>

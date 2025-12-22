@@ -9,18 +9,36 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { deleteNote } from "../Services/noteService";
-const NoteCard = ({ note, toggleFavorite, handleEdit, setData }) => {
+
+const NoteCard = ({
+  note,
+  toggleFavorite,
+  setData,
+  setShowUploadForm,
+  setSelectedNote,
+}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
+  const isPdf = note.file?.endsWith(".pdf");
+  const fileUrl = `http://localhost:3000${note.file}`;
 
-  const isPdf = note.fileType === "pdf";
-  const fileUrl = `http://localhost:3000${note.filePath}`;
   const handleDelete = async (id) => {
-    const deletedNote = await deleteNote(id);
-    setData((prev) => prev.filter((note) => note.id !== id));
+    try {
+      await deleteNote(id);
+
+      setData((prev) => prev.filter((note) => note && note.id !== id));
+    } catch (err) {
+      console.error(err);
+    }
   };
+
+  const handleEdit = (note) => {
+    setSelectedNote(note);
+    setShowUploadForm(true);
+  };
+
   return (
     <>
       <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col gap-3">
@@ -37,9 +55,10 @@ const NoteCard = ({ note, toggleFavorite, handleEdit, setData }) => {
                 <FaRegStar className="text-gray-400 text-lg" />
               )}
             </button>
-            <button onClick={() => handleEdit(note.id)}>
+            <button onClick={() => handleEdit(note)}>
               <FaEdit className="text-blue-500 hover:text-blue-700 text-lg" />
             </button>
+
             <button onClick={() => handleDelete(note.id)}>
               <FaTrash className="text-red-500 hover:text-red-700 text-lg" />
             </button>

@@ -1,19 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MainButton from "./MainButton";
 import SecondaryButton from "./SecondaryButton";
 import toast from "react-hot-toast";
-import { createNote } from "../Services/noteService";
-const UploadNote = ({ showUploadForm, setShowUploadForm, setData }) => {
-  const [title, setTitle] = useState("");
-  const [subject, setSubject] = useState("");
-  const [semester, setSemester] = useState("");
-  const [description, setDescription] = useState("");
+import { createNote, updateNote } from "../Services/noteService";
+const UploadNote = ({ showUploadForm, setShowUploadForm, setData, data }) => {
+  const [title, setTitle] = useState(data?.title || "");
+  const [subject, setSubject] = useState(data?.subject || "");
+  const [semester, setSemester] = useState(data?.semester || "");
+  const [description, setDescription] = useState(data?.description || "");
   const [file, setFile] = useState("");
-
+  useEffect(() => {
+    if (data) {
+      setTitle(data.title || "");
+      setSubject(data.subject || "");
+      setSemester(data.semester || "");
+      setDescription(data.description || "");
+    }
+  }, [data]);
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!title || !subject || !semester || !description || !file) {
+    if (!title || !subject || !semester || !description) {
       toast.error("Enter the valid info");
       return;
     }
@@ -22,12 +29,20 @@ const UploadNote = ({ showUploadForm, setShowUploadForm, setData }) => {
       subject,
       semester,
       description,
-      file,
+      ...(file && { file }),
     };
     try {
-      const createdNote = await createNote(newNote);
-      toast.success("Note added");
-      setData((prevNotes) => [createdNote, ...prevNotes]);
+      if (data) {
+        const updated = await updateNote(data.id, newNote);
+        setData((prev) => prev.map((n) => (n.id === data.id ? updated : n)));
+        toast.success("Note updated");
+      } else {
+        const created = await createNote(newNote);
+        setData((prev) => [created, ...prev]);
+        toast.success("Note added");
+      }
+
+      setShowUploadForm(false);
     } catch (error) {
       toast.error(error.message || "Something went wrong");
     }
