@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import {
   FaStar,
   FaRegStar,
@@ -9,29 +9,30 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { deleteNote } from "../Services/noteService";
-import { Modal } from "react-responsive-modal";
-import "react-responsive-modal/styles.css";
+import { NoteContext } from "../Context/NoteContext";
 
-const NoteCard = ({
-  note,
-  toggleFavorite,
-  setData,
-  setShowUploadForm,
-  setSelectedNote,
-}) => {
+const NoteCard = ({ note }) => {
+  const {
+    notes,
+    setNotes,
+    toggleFavorite,
+    setShowUploadForm,
+    setSelectedNote,
+  } = useContext(NoteContext);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
+
   const isPdf = note.fileType === "pdf";
   const fileUrl = `http://localhost:3000${note.filePath}`;
 
   const handleDelete = async (id) => {
     try {
       await deleteNote(id);
-
-      setData((prev) => prev.filter((note) => note && note.id !== id));
+      setNotes((prev) => prev.filter((n) => n && n.id !== id));
     } catch (err) {
       console.error(err);
     }
@@ -45,7 +46,6 @@ const NoteCard = ({
   return (
     <>
       <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col gap-3">
-        {/* Header: Subject + Actions */}
         <div className="flex justify-between items-center">
           <span className="text-sm font-semibold text-blue-600">
             {note.subject}
@@ -67,13 +67,9 @@ const NoteCard = ({
           </div>
         </div>
 
-        {/* Title */}
         <h3 className="text-lg font-bold">{note.title}</h3>
-
-        {/* Description */}
         <p className="text-sm text-gray-600 line-clamp-3">{note.description}</p>
 
-        {/* Footer: Semester + File Icon + View Button */}
         <div className="flex justify-between items-center mt-auto">
           <span className="text-xs text-gray-500">
             Semester {note.semester}
@@ -96,11 +92,9 @@ const NoteCard = ({
         </div>
       </div>
 
-      {/* Modal for Preview */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col">
-            {/* Modal Header */}
             <div className="flex justify-between items-center p-4 border-b">
               <h3 className="text-lg font-semibold">{note.title}</h3>
               <button
@@ -110,8 +104,6 @@ const NoteCard = ({
                 <FaTimes />
               </button>
             </div>
-
-            {/* Modal Body - PDF or Image Preview */}
             <div className="flex-1 overflow-auto bg-gray-50">
               {isPdf ? (
                 <iframe
@@ -130,6 +122,7 @@ const NoteCard = ({
           </div>
         </div>
       )}
+
       {isDeleteOpen && (
         <div className="fixed inset-0 bg-black/90 bg-opacity-60 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg w-full max-w-xs sm:max-w-md p-5 sm:p-6 mx-2 shadow-lg overflow-auto">
@@ -141,7 +134,6 @@ const NoteCard = ({
               <span className="font-medium">{note.title}</span>? This action
               cannot be undone.
             </p>
-
             <div className="flex flex-col sm:flex-row justify-center sm:justify-end gap-3 mt-5">
               <button
                 onClick={() => setIsDeleteOpen(false)}
@@ -149,7 +141,6 @@ const NoteCard = ({
               >
                 Cancel
               </button>
-
               <button
                 onClick={() => {
                   handleDelete(note.id);
