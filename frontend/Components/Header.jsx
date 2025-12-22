@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useContext } from "react";
 import MainButton from "./MainButton";
-const Header = ({ showUploadForm, setShowUploadForm }) => {
+import { NoteContext } from "../Context/NoteContext";
+const Header = () => {
+  const { setShowUploadForm, showUploadForm } = useContext(NoteContext);
   return (
     <header className="bg-(--mainColor) text-white">
       <div className="flex justify-between  items-center w-full max-w-6xl mx-auto p-4 ">
