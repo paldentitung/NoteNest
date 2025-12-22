@@ -1,65 +1,46 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useContext } from "react";
 import NoteCard from "./NoteCard";
-import { getNotes } from "../Services/noteService";
-const NoteDashboard = ({
-  data,
-  setData,
-  setShowUploadForm,
-  setSelectedNote,
-}) => {
-  const [searchItem, setSearchITem] = useState("");
+import { NoteContext } from "../Context/NoteContext";
+
+const NoteDashboard = ({ setShowUploadForm, setSelectedNote }) => {
+  const { notes, toggleFavorite } = useContext(NoteContext); // get notes & methods from context
+  const [searchItem, setSearchItem] = useState("");
   const [subjectFilter, setSubjectFilter] = useState("");
   const [semester, setSemester] = useState("");
-  useEffect(() => {
-    const fetchNotes = async () => {
-      const notes = await getNotes();
-      setData(notes);
-    };
-    fetchNotes();
-  }, []);
-  useEffect(() => {
-    console.log("Updated notes:", data);
-  }, [data]);
 
-  const filterData = data.filter((data) => {
-    if (!data || !data.title || !data.description) return false;
+  // Filter notes based on search, subject, semester
+  const filterData = notes.filter((note) => {
+    if (!note || !note.title || !note.description) return false;
+
     const searchQuery =
-      data.title.toLowerCase().includes(searchItem.toLowerCase()) ||
-      data.description.toLowerCase().includes(searchItem.toLowerCase());
+      note.title.toLowerCase().includes(searchItem.toLowerCase()) ||
+      note.description.toLowerCase().includes(searchItem.toLowerCase());
 
-    const matchSubject = subjectFilter ? data.subject === subjectFilter : true;
+    const matchSubject = subjectFilter ? note.subject === subjectFilter : true;
+    const matchSemester = semester ? note.semester === semester : true;
 
-    const matchSemester = semester ? data.semester === semester : true;
     return searchQuery && matchSubject && matchSemester;
   });
-  const toggleFavorite = (id) => {
-    setData((prev) => {
-      const updated = prev.map((note) =>
-        note.id === id ? { ...note, isFavorite: !note.isFavorite } : note
-      );
-      // Sort favorites on top
-      return updated.sort(
-        (a, b) => (b.isFavorite ? 1 : 0) - (a.isFavorite ? 1 : 0)
-      );
-    });
-  };
+
   return (
-    <section className="flex flex-col gap-7 ">
+    <section className="flex flex-col gap-7">
       <span className="text-2xl font-semibold">Notes Dashboard</span>
+
+      {/* Filters */}
       <div className="flex gap-4 flex-wrap">
         {/* Search */}
-        <div className="flex-1 ">
+        <div className="flex-1">
           <input
             type="search"
             placeholder="Search notes..."
             value={searchItem}
-            onChange={(e) => setSearchITem(e.target.value)}
+            onChange={(e) => setSearchItem(e.target.value)}
             className="p-2 rounded w-full outline-0 border-0 ring-2 ring-gray-400 focus:ring-mainColor transition-all duration-300"
           />
         </div>
 
         {/* Subject Filter */}
-        <div className="flex-1 ">
+        <div className="flex-1">
           <select
             value={subjectFilter}
             onChange={(e) => setSubjectFilter(e.target.value)}
@@ -74,7 +55,7 @@ const NoteDashboard = ({
         </div>
 
         {/* Semester Filter */}
-        <div className="flex-1 ">
+        <div className="flex-1">
           <select
             value={semester}
             onChange={(e) => setSemester(e.target.value)}
@@ -91,25 +72,21 @@ const NoteDashboard = ({
         </div>
       </div>
 
+      {/* Notes Grid */}
       {filterData.length > 0 ? (
-        <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
-            {filterData.map((note) => (
-              <NoteCard
-                key={note.id}
-                note={note}
-                setData={setData}
-                setShowUploadForm={setShowUploadForm}
-                setSelectedNote={setSelectedNote}
-                toggleFavorite={toggleFavorite}
-              />
-            ))}
-          </div>
-        </>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {filterData.map((note) => (
+            <NoteCard
+              key={note.id}
+              note={note}
+              setShowUploadForm={setShowUploadForm}
+              setSelectedNote={setSelectedNote}
+              toggleFavorite={toggleFavorite}
+            />
+          ))}
+        </div>
       ) : (
-        <>
-          <p className="text-2xl text-red-600 text-center">Not Found</p>
-        </>
+        <p className="text-2xl text-red-600 text-center">No Notes Found</p>
       )}
     </section>
   );
