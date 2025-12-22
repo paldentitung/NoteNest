@@ -9,6 +9,8 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { deleteNote } from "../Services/noteService";
+import { Modal } from "react-responsive-modal";
+import "react-responsive-modal/styles.css";
 
 const NoteCard = ({
   note,
@@ -18,11 +20,12 @@ const NoteCard = ({
   setSelectedNote,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
-  const isPdf = note.file?.endsWith(".pdf");
-  const fileUrl = `http://localhost:3000${note.file}`;
+  const isPdf = note.fileType === "pdf";
+  const fileUrl = `http://localhost:3000${note.filePath}`;
 
   const handleDelete = async (id) => {
     try {
@@ -58,8 +61,7 @@ const NoteCard = ({
             <button onClick={() => handleEdit(note)}>
               <FaEdit className="text-blue-500 hover:text-blue-700 text-lg" />
             </button>
-
-            <button onClick={() => handleDelete(note.id)}>
+            <button onClick={() => setIsDeleteOpen(true)}>
               <FaTrash className="text-red-500 hover:text-red-700 text-lg" />
             </button>
           </div>
@@ -124,6 +126,39 @@ const NoteCard = ({
                   className="w-full h-full object-contain"
                 />
               )}
+            </div>
+          </div>
+        </div>
+      )}
+      {isDeleteOpen && (
+        <div className="fixed inset-0 bg-black/90 bg-opacity-60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-xs sm:max-w-md p-5 sm:p-6 mx-2 shadow-lg overflow-auto">
+            <h3 className="text-lg font-semibold text-gray-800 text-center sm:text-left">
+              Are you sure?
+            </h3>
+            <p className="text-sm text-gray-600 mt-2 text-center sm:text-left">
+              Do you really want to delete{" "}
+              <span className="font-medium">{note.title}</span>? This action
+              cannot be undone.
+            </p>
+
+            <div className="flex flex-col sm:flex-row justify-center sm:justify-end gap-3 mt-5">
+              <button
+                onClick={() => setIsDeleteOpen(false)}
+                className="px-4 py-2 rounded border text-gray-700 hover:bg-gray-100 transition w-full sm:w-auto"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={() => {
+                  handleDelete(note.id);
+                  setIsDeleteOpen(false);
+                }}
+                className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 transition w-full sm:w-auto"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>
