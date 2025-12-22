@@ -32,7 +32,17 @@ const NoteDashboard = ({
     const matchSemester = semester ? data.semester === semester : true;
     return searchQuery && matchSubject && matchSemester;
   });
-
+  const toggleFavorite = (id) => {
+    setData((prev) => {
+      const updated = prev.map((note) =>
+        note.id === id ? { ...note, isFavorite: !note.isFavorite } : note
+      );
+      // Sort favorites on top
+      return updated.sort(
+        (a, b) => (b.isFavorite ? 1 : 0) - (a.isFavorite ? 1 : 0)
+      );
+    });
+  };
   return (
     <section className="flex flex-col gap-7 ">
       <span className="text-2xl font-semibold">Notes Dashboard</span>
@@ -89,6 +99,7 @@ const NoteDashboard = ({
             setData={setData}
             setShowUploadForm={setShowUploadForm}
             setSelectedNote={setSelectedNote}
+            toggleFavorite={toggleFavorite}
           />
         ))}
       </div>
