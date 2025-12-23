@@ -17,17 +17,6 @@ NoteNest is a simple note management application built with **React** (frontend)
 - Backend: Node.js, Express, Multer (for file uploads)
 - Storage: JSON file
 
-notenest/
-├─ backend/
-│ ├─ controllers/
-│ ├─ middlewares/
-│ ├─ data/
-│ └─ routes/
-├─ frontend/
-│ ├─ src/
-│ └─ public/
-└─ README.md
-
 ---
 
 ## Developer
