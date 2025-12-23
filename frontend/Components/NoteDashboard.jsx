@@ -2,8 +2,8 @@ import React, { useState, useContext } from "react";
 import NoteCard from "./NoteCard";
 import { NoteContext } from "../Context/NoteContext";
 
-const NoteDashboard = ({ setShowUploadForm, setSelectedNote }) => {
-  const { notes, toggleFavorite } = useContext(NoteContext); // get notes & methods from context
+const NoteDashboard = () => {
+  const { notes } = useContext(NoteContext);
   const [searchItem, setSearchItem] = useState("");
   const [subjectFilter, setSubjectFilter] = useState("");
   const [semester, setSemester] = useState("");
@@ -76,13 +76,7 @@ const NoteDashboard = ({ setShowUploadForm, setSelectedNote }) => {
       {filterData.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {filterData.map((note) => (
-            <NoteCard
-              key={note.id}
-              note={note}
-              setShowUploadForm={setShowUploadForm}
-              setSelectedNote={setSelectedNote}
-              toggleFavorite={toggleFavorite}
-            />
+            <NoteCard key={note.id} note={note} />
           ))}
         </div>
       ) : (

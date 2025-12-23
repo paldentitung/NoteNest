@@ -10,15 +10,11 @@ import {
 } from "react-icons/fa";
 import { deleteNote } from "../Services/noteService";
 import { NoteContext } from "../Context/NoteContext";
+import toast from "react-hot-toast";
 
 const NoteCard = ({ note }) => {
-  const {
-    notes,
-    setNotes,
-    toggleFavorite,
-    setShowUploadForm,
-    setSelectedNote,
-  } = useContext(NoteContext);
+  const { setNotes, toggleFavorite, setShowUploadForm, setSelectedNote } =
+    useContext(NoteContext);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -33,8 +29,9 @@ const NoteCard = ({ note }) => {
     try {
       await deleteNote(id);
       setNotes((prev) => prev.filter((n) => n && n.id !== id));
+      toast.success("Note Deleted");
     } catch (err) {
-      console.error(err);
+      toast.error(err);
     }
   };
 

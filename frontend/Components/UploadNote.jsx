@@ -2,155 +2,160 @@ import React, { useState, useEffect, useContext } from "react";
 import MainButton from "./MainButton";
 import SecondaryButton from "./SecondaryButton";
 import toast from "react-hot-toast";
-import { createNote, updateNote } from "../Services/noteService";
 import { NoteContext } from "../Context/NoteContext";
 
 const UploadNote = () => {
   const {
     showUploadForm,
     setShowUploadForm,
-    notes,
     setNotes,
     selectedNote,
     setSelectedNote,
   } = useContext(NoteContext);
 
-  const [title, setTitle] = useState(selectedNote?.title || "");
-  const [subject, setSubject] = useState(selectedNote?.subject || "");
-  const [semester, setSemester] = useState(selectedNote?.semester || "");
-  const [description, setDescription] = useState(
-    selectedNote?.description || ""
-  );
-  const [file, setFile] = useState("");
+  const [title, setTitle] = useState("");
+  const [subject, setSubject] = useState("");
+  const [semester, setSemester] = useState("");
+  const [description, setDescription] = useState("");
+  const [file, setFile] = useState(null);
 
+  // Fill form when editing
   useEffect(() => {
     if (selectedNote) {
       setTitle(selectedNote.title || "");
       setSubject(selectedNote.subject || "");
       setSemester(selectedNote.semester || "");
       setDescription(selectedNote.description || "");
+      setFile(null);
     }
   }, [selectedNote]);
+
+  const resetForm = () => {
+    setTitle("");
+    setSubject("");
+    setSemester("");
+    setDescription("");
+    setFile(null);
+    setSelectedNote(null);
+    setShowUploadForm(false);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!title || !subject || !semester || !description) {
-      toast.error("Enter the valid info");
+      toast.error("Enter valid info");
       return;
     }
 
-    const newNote = {
-      title,
-      subject,
-      semester,
-      description,
-      ...(file && { file }),
-    };
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("subject", subject);
+    formData.append("semester", semester);
+    formData.append("description", description);
+    if (file) formData.append("file", file);
 
     try {
+      const url = selectedNote
+        ? `http://localhost:3000/api/notes/${selectedNote.id}`
+        : "http://localhost:3000/api/notes";
+
+      const res = await fetch(url, {
+        method: selectedNote ? "PUT" : "POST",
+        body: formData,
+      });
+
+      const response = await res.json();
+      if (!res.ok) throw new Error(response.message || "Something went wrong");
+
+      // IMPORTANT: backend returns { message, note }
+      const note = response.note ?? response;
+
       if (selectedNote) {
-        const updated = await updateNote(selectedNote.id, newNote);
         setNotes((prev) =>
-          prev.map((n) => (n.id === selectedNote.id ? updated : n))
+          prev.map((n) => (n.id === selectedNote.id ? note : n))
         );
         toast.success("Note updated");
       } else {
-        const created = await createNote(newNote);
-        setNotes((prev) => [created, ...prev]);
+        setNotes((prev) => [note, ...prev]);
         toast.success("Note added");
       }
 
-      setShowUploadForm(false);
-      setSelectedNote(null);
-    } catch (error) {
-      toast.error(error.message || "Something went wrong");
+      resetForm();
+    } catch (err) {
+      toast.error(err.message);
     }
-
-    setTitle("");
-    setSubject("");
-    setSemester("");
-    setDescription("");
-    setFile("");
   };
 
   return (
     <section
-      className={`bg-white rounded-md shadow-md flex flex-col space-y-5 transition-all duration-300 transform 
+      className={`bg-white rounded-md shadow-md flex flex-col space-y-5 transition-all duration-300
         ${
           showUploadForm
             ? "opacity-100 scale-100 h-auto p-5 mb-5"
             : "opacity-0 scale-95 h-0 overflow-hidden"
-        }
-      `}
+        }`}
     >
-      <h2 className="text-2xl font-semibold">Upload New Note</h2>
+      <h2 className="text-2xl font-semibold">
+        {selectedNote ? "Edit Note" : "Upload New Note"}
+      </h2>
+
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <div className="flex gap-4">
-          <div className="flex-1">
-            <select
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              className="p-2 rounded w-full outline-0 border-0 ring-2 ring-gray-400 focus:ring-mainColor"
-            >
-              <option value="">Select Subject</option>
-              <option value="DSA">DSA</option>
-              <option value="DBMS">DBMS</option>
-              <option value="Math">Math</option>
-              <option value="WebDev">Web Development</option>
-            </select>
-          </div>
-          <div className="flex-1">
-            <select
-              value={semester}
-              onChange={(e) => setSemester(e.target.value)}
-              className="p-2 rounded w-full outline-0 border-0 ring-2 ring-gray-400 focus:ring-mainColor"
-            >
-              <option value="">Select Semester</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-            </select>
-          </div>
+          <select
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+            className="p-2 rounded w-full ring-2 ring-gray-400 focus:ring-blue-500"
+          >
+            <option value="">Select Subject</option>
+            <option value="DSA">DSA</option>
+            <option value="DBMS">DBMS</option>
+            <option value="Math">Math</option>
+            <option value="WebDev">Web Development</option>
+          </select>
+
+          <select
+            value={semester}
+            onChange={(e) => setSemester(e.target.value)}
+            className="p-2 rounded w-full ring-2 ring-gray-400 focus:ring-blue-500"
+          >
+            <option value="">Select Semester</option>
+            {[1, 2, 3, 4, 5, 6].map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
         </div>
 
-        <div>
-          <input
-            type="text"
-            placeholder="Note Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="p-2 rounded w-full outline-0 border-0 ring-2 ring-gray-400 focus:ring-mainColor"
-          />
-        </div>
+        <input
+          type="text"
+          placeholder="Note Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="p-2 rounded w-full ring-2 ring-gray-400 focus:ring-blue-500"
+        />
 
-        <div>
-          <textarea
-            placeholder="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="p-2 rounded w-full outline-0 border-0 ring-2 ring-gray-400 focus:ring-mainColor"
-            rows={3}
-          />
-        </div>
+        <textarea
+          placeholder="Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={3}
+          className="p-2 rounded w-full ring-2 ring-gray-400 focus:ring-blue-500"
+        />
 
-        <div>
-          <input
-            type="file"
-            onChange={(e) => setFile(e.target.files[0])}
-            className="p-2 rounded w-full outline-0 border-0 ring-2 ring-gray-400 focus:ring-mainColor"
-          />
-        </div>
+        <input
+          type="file"
+          onChange={(e) => setFile(e.target.files[0])}
+          className="p-2 rounded w-full ring-2 ring-gray-400 focus:ring-blue-500"
+        />
 
         <div className="flex justify-end gap-2">
-          <SecondaryButton
-            onClick={() => setShowUploadForm(false)}
-            title="cancel"
+          <SecondaryButton title="Cancel" onClick={resetForm} />
+          <MainButton
+            title={selectedNote ? "Update" : "Upload"}
+            type="submit"
           />
-          <MainButton title="Upload" type="submit" />
         </div>
       </form>
     </section>

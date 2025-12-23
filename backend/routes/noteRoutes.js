@@ -10,6 +10,6 @@ const router = express.Router();
 
 router.get("/", getAllNotes);
 router.post("/", upload.single("file"), createNote);
-router.put("/:id", updateNote);
+router.put("/:id", upload.single("file"), updateNote);
 router.delete("/:id", deleteNote);
 module.exports = router;
